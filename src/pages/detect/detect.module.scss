@@ -1,0 +1,53 @@
+@use "src/utils/scss/media" as media;
+
+.section {
+  width: 100vw;
+  height: 696px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: #FBFBFB;
+
+  &__title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Pretendard;
+    font-weight: 800;
+    font-size: 48px;
+    margin-bottom: 40px;
+  }
+
+  &__content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Pretendard;
+    font-weight: 500;
+    font-size: 32px;
+    text-align: center;
+  }
+
+  &__upload {
+    margin-top: 20px;
+    font-family: Pretendard;
+    font-weight: 500;
+    font-size: 16px;
+    label {
+      cursor: pointer;
+      background-color: #E0E0E0;
+      padding: 10px 20px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+    input[type="file"] {
+      display: none;
+    }
+  }
+}
+
+.logo {
+  width: 400px;
+  height: 400px;
+}

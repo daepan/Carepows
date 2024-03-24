@@ -1,0 +1,11 @@
+@use "src/utils/scss/media" as media;
+/* stylelint-disable scss/at-import-no-partial-leading-underscore */
+@import "reset-css/sass/_reset";
+/* stylelint-enable scss/at-import-no-partial-leading-underscore */
+
+@font-face {
+  font-family: Pretendard;
+  src:
+    local("Pretendard"),
+    url("/fonts/Pretendard-Black.woff2") format("woff2"),
+}

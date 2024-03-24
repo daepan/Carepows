@@ -1,0 +1,33 @@
+@use "src/utils/scss/media" as media;
+
+.section {
+  width: 100vw;
+  height: 696px;
+  float: left;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #FFF;
+
+  &__content {
+    width: 700px;
+    display: flex;
+    flex-direction: column;
+    margin-right: 20px;
+    font-family: Pretedard;
+  }
+
+  &__image {
+    width: 475px;
+    height: 350px;
+  }
+}
+
+.title {
+  font-weight: 800;
+}
+
+.desciprtion {
+  font-weight: 500;
+  font-size: 18px;
+}
