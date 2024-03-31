@@ -1,0 +1,11 @@
+@use "src/utils/scss/media" as media;
+
+.section {
+  width: 100vw;
+  height: 696px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: #FBFBFB;
+}
