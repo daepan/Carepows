@@ -2,12 +2,20 @@
 
 .section {
   width: 100vw;
-  height: 696px;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
   background-color: #FBFBFB;
+
+  &__context {
+    width: 50vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: Pretendard;
+  }
 
   &__title {
     display: flex;
@@ -34,12 +42,19 @@
     font-family: Pretendard;
     font-weight: 500;
     font-size: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100px;
+
     label {
       cursor: pointer;
       background-color: #E0E0E0;
       padding: 10px 20px;
       border-radius: 8px;
       display: inline-block;
+      margin-bottom: 12px;
     }
     input[type="file"] {
       display: none;
@@ -50,4 +65,43 @@
 .logo {
   width: 400px;
   height: 400px;
+}
+
+.preview {
+  display: flex;
+  width: 240;
+  height: 750px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  &__image {
+    max-width: 240px;
+    max-height: 240px;
+  }
+
+  &__remove {
+    cursor: pointer;
+    background-color: #ff000f;
+    width: 100px;
+    margin-top: 5px;
+    color: #FBFBFB;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 12px;
+  }
+}
+
+.submit {
+  background-color: #E0E0E0;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: inline-block;
+
+  &--able {
+    cursor: pointer;
+  }
 }
