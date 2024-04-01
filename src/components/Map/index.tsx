@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from "react";
+import { useGeoLocation } from "../../utils/hooks/useGeoLocation";
 
 declare global {
   interface Window {
@@ -6,42 +7,79 @@ declare global {
   }
 }
 
+const geolocationOptions = {
+  enableHighAccuracy: true,
+  timeout: 1000 * 10,
+  maximumAge: 1000 * 3600 * 24,
+};
+
+interface Place {
+  y: string;
+  x: string;
+  place_name: string;
+}
+
 const Map = () => {
-  const mapContainer = React.useRef(null);
+  const { location } = useGeoLocation(geolocationOptions);
+  const mapContainer = useRef<HTMLDivElement>(null);
   const { kakao } = window;
-  const position = new kakao.maps.LatLng(33.450701, 126.570667);
-  const mapOptions = {
-    center: position, // 지도의 중심좌표
-    level: 4 // 지도의 확대 레벨
+
+  const displayMarker = (map: any, place: Place) => {
+    const marker = new kakao.maps.Marker({
+      map,
+      position: new kakao.maps.LatLng(parseFloat(place.y), parseFloat(place.x)),
+    });
+    const infowindow = new kakao.maps.InfoWindow({
+      content: `<div style="padding:5px;font-size:12px;">${place.place_name}</div>`, // 장소명이 표출될 인포윈도우
+    });
+
+    kakao.maps.event.addListener(marker, "click", () => {
+      infowindow.open(map, marker);
+    });
   };
 
   useEffect(() => {
+    if (!mapContainer.current || !kakao) return;
+
+    const position = new kakao.maps.LatLng(
+      location.latitude,
+      location.longitude
+    );
+    const mapOptions = {
+      center: position,
+      level: 4,
+    };
     const map = new kakao.maps.Map(mapContainer.current, mapOptions);
-    const marker = new kakao.maps.Marker({ position }); // 마커 생성
-    
-    // 커스텀 오버레이에 표출될 내용
-    const content = `
-        <div class="customoverlay">
-          <span>포썸</span>
-        </div>`;
-  
-    // 커스텀 오버레이 생성
-    new kakao.maps.CustomOverlay({
+
+    new kakao.maps.Marker({
       map,
       position,
-      content
     });
-  
-    // 마커가 지도 위에 표시되도록 설정
-    marker.setMap(map);
-  
-  }, []);
+    if (kakao.maps.services) {
+      console.log(kakao.maps.services);
+      const ps = new kakao.maps.services.Places();
+
+      ps.keywordSearch("동물병원", (data: Place[], status: any) => {
+        if (status === kakao.maps.services.Status.OK) {
+          let bounds = new kakao.maps.LatLngBounds();
+          console.log(bounds);
+          data.forEach((place) => {
+            displayMarker(map, place);
+            bounds.extend(
+              new kakao.maps.LatLng(parseFloat(place.y), parseFloat(place.x))
+            );
+          });
+          map.setBounds(bounds);
+        }
+      });
+    }
+  }, [location, kakao]);
 
   return (
     <div
       id="map"
       ref={mapContainer}
-      style={{ width: '100%', height: '350px', display: 'block' }}
+      style={{ width: "100%", height: "350px" }}
     ></div>
   );
 };

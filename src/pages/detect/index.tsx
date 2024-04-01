@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import cn from '../../utils/ts/clsssNames';
 import styles from './detect.module.scss';
 
@@ -9,7 +10,7 @@ interface SelectedImage {
 
 const Detect: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
-
+  const navigate = useNavigate();
   const handleUpload = (file: File): void => {
     setSelectedImage({
       preview: URL.createObjectURL(file),
@@ -43,6 +44,11 @@ const Detect: React.FC = () => {
     }
   };
 
+  const onClickSubmit = (e: React.MouseEvent<HTMLButtonElement>): void => {
+    e.preventDefault();
+    navigate('/location');
+  };
+
   return (
     <div className={styles.section}>
       <div className={styles.section__context}>
@@ -74,7 +80,7 @@ const Detect: React.FC = () => {
         <button className={cn({
           [styles.submit]: true,
           [styles['submit--able']]: !!selectedImage,
-        })} disabled={!selectedImage} onClick={() => console.log('Submit logic here')}>
+        })} disabled={!selectedImage} onClick={(e) => onClickSubmit(e)}>
           진단해보기
         </button>
       </div>
