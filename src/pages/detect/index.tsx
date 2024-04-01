@@ -65,7 +65,7 @@ const Detect: React.FC = () => {
         {selectedImage && (
           <div className={styles.preview}>
             <img className={styles.preview__image} src={selectedImage.preview} alt="Preview" />
-            <button className={styles.preview__remove} onClick={clearImage}>Remove</button>
+            <button className={styles.preview__remove} onClick={clearImage}>제거</button>
           </div>
         )}
         <div>파일을 드래그하거나 업로드해주세요</div>
