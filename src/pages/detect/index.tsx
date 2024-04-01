@@ -60,15 +60,17 @@ const Detect: React.FC = () => {
           type="file" 
           accept="image/*" 
           onChange={onFileChange} 
-          style={{ display: 'none' }} // Hide the file input
+          style={{ display: 'none' }}
         />
-        {selectedImage && (
+        {selectedImage ? (
           <div className={styles.preview}>
             <img className={styles.preview__image} src={selectedImage.preview} alt="Preview" />
             <button className={styles.preview__remove} onClick={clearImage}>제거</button>
           </div>
+        ) : (
+          <div className={styles.file}>파일을 드래그하거나 업로드해주세요</div>
         )}
-        <div>파일을 드래그하거나 업로드해주세요</div>
+        
         <button className={cn({
           [styles.submit]: true,
           [styles['submit--able']]: !!selectedImage,

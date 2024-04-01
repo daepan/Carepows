@@ -16,7 +16,7 @@
     font-family: Pretendard;
     font-weight: 800;
     font-size: 48px;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
   }
 
   &__content {
@@ -27,6 +27,17 @@
     font-weight: 500;
     font-size: 32px;
     text-align: center;
+  }
+
+  &__detect {
+    cursor: pointer;
+    background-color: #000000;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: inline-block;
+    margin: 12px 0;
+    text-decoration: none;
   }
 }
 

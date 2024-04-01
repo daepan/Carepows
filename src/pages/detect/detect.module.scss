@@ -46,6 +46,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    width: 50vw;
     height: 100px;
 
     label {
@@ -56,6 +57,7 @@
       display: inline-block;
       margin-bottom: 12px;
     }
+
     input[type="file"] {
       display: none;
     }
@@ -65,6 +67,20 @@
 .logo {
   width: 400px;
   height: 400px;
+}
+
+.file {
+  height: 300px;
+  width: 300px;
+  border: 2px dashed #007bff;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12    0px 40px;
+  margin: 20px auto;
+  cursor: pointer;
 }
 
 .preview {
