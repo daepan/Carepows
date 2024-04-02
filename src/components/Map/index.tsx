@@ -56,7 +56,6 @@ const Map = () => {
     `
 
     if (kakao.maps.services) {
-      console.log(kakao.maps.services);
       const ps = new kakao.maps.services.Places();
       
       const options = {
