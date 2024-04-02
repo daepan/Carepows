@@ -16,8 +16,8 @@ export const useGeoLocation = (options = {}) => {
     const { latitude, longitude } = pos.coords;
 
     setLocation({
-      latitude: latitude ? latitude : 36.759,
-      longitude: longitude ? longitude : 127.2874,
+      latitude,
+      longitude,
     });
   };
 

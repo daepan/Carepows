@@ -19,6 +19,7 @@ interface Place {
   place_name: string;
 }
 
+
 const Map = () => {
   const { location } = useGeoLocation(geolocationOptions);
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -50,15 +51,20 @@ const Map = () => {
       level: 4,
     };
     const map = new kakao.maps.Map(mapContainer.current, mapOptions);
+    const content = `
+      <div class="customoverlay"><span>내 위치</span></div>
+    `
 
-    new kakao.maps.Marker({
-      map,
-      position,
-    });
     if (kakao.maps.services) {
       console.log(kakao.maps.services);
       const ps = new kakao.maps.services.Places();
-
+      
+      const options = {
+        location: new kakao.maps.LatLng(location.latitude, location.longitude),
+        radius: 10000,
+        sort: kakao.maps.services.SortBy.DISTANCE,
+      };
+      
       ps.keywordSearch("동물병원", (data: Place[], status: any) => {
         if (status === kakao.maps.services.Status.OK) {
           let bounds = new kakao.maps.LatLngBounds();
@@ -71,8 +77,14 @@ const Map = () => {
           });
           map.setBounds(bounds);
         }
-      });
+      }, options);
     }
+
+    new kakao.maps.Marker({
+      map,
+      position,
+      content,
+    });
   }, [location, kakao]);
 
   return (
