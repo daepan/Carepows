@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import cn from '../../utils/ts/clsssNames';
-import styles from './detect.module.scss';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import cn from "../../utils/ts/clsssNames";
+import styles from "./detect.module.scss";
 
 interface SelectedImage {
   preview: string;
@@ -9,7 +9,10 @@ interface SelectedImage {
 }
 
 const Detect: React.FC = () => {
-  const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(null);
+  const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const handleUpload = (file: File): void => {
     setSelectedImage({
@@ -31,7 +34,7 @@ const Detect: React.FC = () => {
 
   const onDrop = (event: React.DragEvent<HTMLDivElement>): void => {
     event.preventDefault();
-    const file = event.dataTransfer.files[0]; // Assuming single file drop
+    const file = event.dataTransfer.files[0];
     if (file) {
       handleUpload(file);
     }
@@ -39,51 +42,76 @@ const Detect: React.FC = () => {
 
   const clearImage = (): void => {
     if (selectedImage) {
-      URL.revokeObjectURL(selectedImage.preview); // Clean up
+      URL.revokeObjectURL(selectedImage.preview);
       setSelectedImage(null);
     }
   };
 
   const onClickSubmit = (e: React.MouseEvent<HTMLButtonElement>): void => {
     e.preventDefault();
-    navigate('/location');
+    setIsLoading(true); // 로딩 시작
+    setTimeout(() => {
+      setIsLoading(false); // 로딩 종료
+      navigate("/location"); // 페이지 이동
+    }, 2000); // 2초 후 실행
   };
 
   return (
     <div className={styles.section}>
       <div className={styles.section__context}>
-        <img className={styles.logo} src={process.env.PUBLIC_URL + 'images/carepawsLogo.jpg'} alt="로고" />
+        <img
+          className={styles.logo}
+          src={process.env.PUBLIC_URL + "images/carepawsLogo.jpg"}
+          alt="로고"
+        />
         <div>강아지의 피부 질환이 의심되는 부위를 찍어주세요</div>
       </div>
-      <div 
+      <div
         className={styles.section__upload}
         onDragOver={onDragOver}
         onDrop={onDrop}
       >
         <label htmlFor="file-upload">사진 업로드하기</label>
-        <input 
-          id="file-upload" 
-          type="file" 
-          accept="image/*" 
-          onChange={onFileChange} 
-          style={{ display: 'none' }}
+        <input
+          id="file-upload"
+          type="file"
+          accept="image/*"
+          onChange={onFileChange}
+          style={{ display: "none" }}
         />
         {selectedImage ? (
           <div className={styles.preview}>
-            <img className={styles.preview__image} src={selectedImage.preview} alt="Preview" />
-            <button className={styles.preview__remove} onClick={clearImage}>제거</button>
+            <img
+              className={styles.preview__image}
+              src={selectedImage.preview}
+              alt="Preview"
+            />
+            <button className={styles.preview__remove} onClick={clearImage}>
+              제거
+            </button>
           </div>
         ) : (
-          <div className={styles.file}>파일을 드래그하거나 업로드해주세요</div>
+          <div className={styles.file} aria-hidden>
+            파일을 드래그하거나 업로드해주세요
+          </div>
         )}
-        
-        <button className={cn({
-          [styles.submit]: true,
-          [styles['submit--able']]: !!selectedImage,
-        })} disabled={!selectedImage} onClick={(e) => onClickSubmit(e)}>
+
+        <button
+          className={cn({
+            [styles.submit]: true,
+            [styles["submit--able"]]: !!selectedImage,
+          })}
+          disabled={!selectedImage}
+          onClick={(e) => onClickSubmit(e)}
+        >
           진단해보기
         </button>
       </div>
+      {isLoading && (
+        <div className={styles.background}>
+          <img src="/images/loading.svg" alt="로딩 중" />
+        </div>
+      )}
     </div>
   );
 };
