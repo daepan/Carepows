@@ -1,17 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useImage } from "../../components/context/ImageContext";
 import cn from "../../utils/ts/clsssNames";
 import styles from "./detect.module.scss";
 
-interface SelectedImage {
-  preview: string;
-  file: File;
-}
-
 const Detect: React.FC = () => {
-  const [selectedImage, setSelectedImage] = useState<SelectedImage | null>(
-    null
-  );
+  const { selectedImage, setSelectedImage } = useImage();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const handleUpload = (file: File): void => {

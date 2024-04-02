@@ -1,7 +1,10 @@
 import KakaoMap from "../../components/Map";
+import { useImage } from "../../components/context/ImageContext";
 import styles from "./location.module.scss";
 
 export default function Location() {
+  const { selectedImage } = useImage();
+
   return (
     <div className={styles.template}>
       <div className={styles.template__location}>
@@ -14,12 +17,22 @@ export default function Location() {
       </div>
       <div className={styles.template__result}>
         <div className={styles.result}>
+          {selectedImage && (
+            <img
+              className={styles.result__image}
+              src={selectedImage.preview}
+              alt="Selected"
+            />
+          )}
+          <br />
           <div className={styles.result__title}>
             진단 결과: 종괴 / 결절로 의심됩니다.{"(73%)"}
             <div className={styles.result__description}></div>
           </div>
+          <br />
           <div className={styles.result__content}>
             <div className={styles.result__subject}>견종별 대처 방법</div>
+            <br />
             <div className={styles.species}>
               <div className={styles.species__small}>
                 소형견 :
@@ -32,6 +45,7 @@ export default function Location() {
                   중요합니다.
                 </li>
               </div>
+              <br />
               <div className={styles.species__middle}>
                 중형견 :
                 <li>
@@ -44,6 +58,7 @@ export default function Location() {
                 </li>
                 <li>종괴의 성장 속도, 색상, 모양 변화에 주의를 기울이세요.</li>
               </div>
+              <br />
               <div className={styles.species__large}>
                 대형견
                 <li>
