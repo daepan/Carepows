@@ -2,12 +2,12 @@
 
 .section {
   width: 100vw;
-  height: 696px;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background-color: #FBFBFB;
+  background-color: #fbfbfb;
 
   &__title {
     display: flex;
