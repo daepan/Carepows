@@ -1,0 +1,30 @@
+@use "src/utils/scss/media" as media;
+
+.header {
+  width: 100vw;
+  height: 75px;
+  background-color: #fefefe;
+  font-family: Pretendard;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Logo {
+  width: 10vw;
+  font-size: 48px;
+  font-weight: 800;
+  margin-left: 40px;
+}
+
+.item {
+  width: 30vw;
+  display: flex;
+  font-size: 28px;
+  font-weight: 500;
+
+  &__list {
+    text-decoration: none;
+    color: #000;
+  }
+}
