@@ -11,6 +11,9 @@ export default function Header() {
         <Link className={styles.item__list} to="/detect">
           AI 진단
         </Link>
+        <Link className={styles.item__list} to="/doctor">
+          수의사 등록하기
+        </Link>
       </div>
     </div>
   )
