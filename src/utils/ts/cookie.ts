@@ -1,9 +1,9 @@
-export function setCookie(name: string, val: any, day: number) {
+export function setCookie(name: string, val: any, hour: number) {
   const date = new Date();
   const value = val;
-  // day가 없는 경우 세션쿠키로 설정
-  if (day) {
-    date.setTime(date.getTime() + (day * 24 * 60 * 60 * 1000));
+  // hour가 없는 경우 세션쿠키로 설정
+  if (hour) {
+    date.setTime(date.getTime() + (hour * 60 * 60 * 1000));
     document.cookie = `${name}=${value}; expires=${date.toUTCString()}; path=/`;
   } else {
     document.cookie = `${name}=${value}; path=/`;

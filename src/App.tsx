@@ -10,6 +10,7 @@ import Doctor from './pages/doctor';
 import ReserveDoctor from './pages/reserveDoctor';
 import DoctorDetail from './pages/doctorDetail';
 import SocketRoom from './pages/socketRoom';
+import Reserve from './pages/reserve';
 import './fonts.css';
 import './App.css';
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/reserve" element={<ReserveDoctor />} />
         <Route path="/doctorDetail" element={<DoctorDetail />} />
         <Route path="/room" element={<SocketRoom />} />
+        <Route path="/reserveDetail" element={<Reserve />} />
       </Route>
     </Routes>
   );

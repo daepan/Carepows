@@ -12,7 +12,7 @@ export default function Doctor() {
   const navigate = useNavigate();
   const onSubmit = (e: any) => {
     e.preventDefault();
-    navigate("/room");
+    navigate("/doctorDetail");
   }
   return (
     <div className={styles.template}>
