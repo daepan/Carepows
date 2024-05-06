@@ -1,1 +1,27 @@
 @use "src/utils/scss/media" as media;
+
+.template {
+  width: 100vw;
+  height: 679px;
+  display: flex;
+  padding: 40px;
+  background-color: #fbfbfb;
+  font-family: Pretendard;
+  flex-direction: column;
+
+  &__header {
+    width: 100vw;
+    height: 75px;
+    background-color: #fefefe;
+    font-size: 48px;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__create {
+    width: 500px;
+    height: 300px;
+  }
+}

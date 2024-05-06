@@ -1,7 +1,37 @@
 import express from 'express';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
-import schedule from 'node-schedule';
+import bodyParser from 'body-parser';
+
+const doctors = [
+  {
+    id: 1,
+    userId: "qw03011",
+    password: "1234",
+    name: "김대관",
+    number: "042-472-8480",
+    describe: "성실하게 임하겠습니다.",
+    location: "대전패트릭동물병원",
+  },
+  {
+    id: 2,
+    name: "김형진",
+    userId: "hy123",
+    password: "1234",
+    number: "041-422-8610",
+    describe: "잘 임하겠습니다.",
+    location: "서울진사동물병원",
+  },
+  {
+    id: 3,
+    name: "전민서",
+    userId: "ms123",
+    password: "1234",
+    number: "02-725-8508",
+    describe: "열심히 임하겠습니다.",
+    location: "청주펫케어병원",
+  },
+];
 
 interface Room {
   id: string;
@@ -13,33 +43,59 @@ const app = express();
 const server = http.createServer(app);
 const io = new SocketIOServer(server);
 
-const rooms: Record<string, Room> = {}; // 간단한 방 관리를 위한 객체
+const rooms: Record<string, Room> = {};
+
+function createRoom(name: string, roomId: string): Room {
+  const room: Room = { id: roomId, name, isOpen: true };
+  rooms[roomId] = room;
+  return room;
+}
+
+// 사전에 방 세 개 생성
+createRoom("Chat Room 1", '0');
+createRoom("Chat Room 2", '1');
+createRoom("Chat Room 3", '2');
 
 app.use(express.static('public'));
 
-// 기본 라우트 설정
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-// 소켓 연결 설정
+
+app.post('/login', (req, res) => {
+  const { userId, password } = req.body;
+  const doctor = doctors.find(d => d.userId === userId && d.password === password);
+
+  if (doctor) {
+    res.json({
+      success: true,
+      message: '로그인 성공!',
+      data: doctor
+    });
+  } else {
+    res.status(401).json({
+      success: false,
+      message: '아이디 또는 비밀번호가 잘못되었습니다.'
+    });
+  }
+});
+
+
 io.on('connection', (socket) => {
   console.log('A user connected');
 
-  socket.on('create-room', (name: string) => {
-    const roomId = generateRoomId();
-    rooms[roomId] = { id: roomId, name, isOpen: false };
-    socket.join(roomId);
-    io.emit('room-created', rooms[roomId]);
-  });
-
-  socket.on('delete-room', (roomId: string) => {
-    delete rooms[roomId];
-    io.emit('room-deleted', roomId);
-  });
-
   socket.on('get-rooms', () => {
-    socket.emit('rooms-list', rooms);
+    socket.emit('rooms-list', Object.values(rooms));
+  });
+
+  socket.on('join-room', (roomId: string) => {
+    if (rooms[roomId] && rooms[roomId].isOpen) {
+      socket.join(roomId);
+      socket.emit('joined-room', roomId);
+    } else {
+      socket.emit('error', 'Room is not available');
+    }
   });
 
   socket.on('disconnect', () => {
@@ -47,25 +103,6 @@ io.on('connection', (socket) => {
   });
 });
 
-// 방 ID 생성 함수
-function generateRoomId(): string {
-  return Math.random().toString(36).substring(2, 9);
-}
-
-// 예약된 시간에 방을 열기 위한 스케줄러
-function scheduleRoomOpening(roomId: string, date: Date) {
-  schedule.scheduleJob(date, () => {
-    if (rooms[roomId]) {
-      rooms[roomId].isOpen = true;
-      io.to(roomId).emit('room-opened', roomId);
-    }
-  });
-}
-
-// 예제로 방 하나를 예약
-scheduleRoomOpening('123456', new Date(Date.now() + 5000)); // 5초 후에 방을 엽니다
-
-// 서버 실행
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
