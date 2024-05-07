@@ -1,7 +1,6 @@
 import express from 'express';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
-import bodyParser from 'body-parser';
 
 const doctors = [
   {
@@ -59,7 +58,7 @@ createRoom("Chat Room 3", '2');
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/public/index.html');
+  res.sendFile(__dirname + './frontend/public/index.html');
 });
 
 
