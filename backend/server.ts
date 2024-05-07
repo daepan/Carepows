@@ -1,6 +1,13 @@
 import express from 'express';
 import http from 'http';
+
 import { Server as SocketIOServer } from 'socket.io';
+const cors = require('cors')
+
+let corsOptions = {
+  origin: '*',      // 출처 허용 옵션
+  credential: true, // 사용자 인증이 필요한 리소스(쿠키 등) 접근
+}
 
 const doctors = [
   {
@@ -42,6 +49,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new SocketIOServer(server);
 
+app.use(cors(corsOptions))
 const rooms: Record<string, Room> = {};
 
 function createRoom(name: string, roomId: string): Room {
@@ -56,11 +64,8 @@ createRoom("Chat Room 2", '1');
 createRoom("Chat Room 3", '2');
 
 app.use(express.static('public'));
-
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + './frontend/public/index.html');
-});
-
+app.use("/", express.static(`${process.cwd()}/../frontend/build`));
+app.use(express.json());
 
 app.post('/login', (req, res) => {
   const { userId, password } = req.body;
