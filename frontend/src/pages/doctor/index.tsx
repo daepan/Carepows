@@ -1,6 +1,7 @@
 import React from "react";
 import { FormControl, Input, InputLabel, FormHelperText } from "@mui/material";
 import Button from "@mui/material/Button";
+import { setCookie } from "utils/ts/cookie";
 import { useNavigate } from "react-router-dom";
 import styles from "./doctor.module.scss";
 
@@ -34,6 +35,8 @@ export default function Doctor() {
         const data = await response.json();
         if (response.ok) {
           console.log("Login successful:", data);
+          setCookie('name', data.data.name, 1);
+          setCookie('id', data.data.id, 1);
           navigate("/doctorDetail"); // 로그인 성공 시 페이지 이동
         } else {
           console.error("Login failed:", data.message);

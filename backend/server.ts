@@ -85,7 +85,6 @@ app.post('/login', (req, res) => {
   }
 });
 
-
 io.on('connection', (socket) => {
   console.log('A user connected');
 
