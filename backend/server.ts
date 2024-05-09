@@ -84,7 +84,6 @@ app.post('/login', (req, res) => {
     });
   }
 });
-
 io.on('connection', (socket) => {
   console.log('A user connected');
 
@@ -93,16 +92,43 @@ io.on('connection', (socket) => {
   });
 
   socket.on('join-room', (roomId: string) => {
+    console.log(`User joined room: ${roomId}`);
     if (rooms[roomId] && rooms[roomId].isOpen) {
       socket.join(roomId);
+
+      const otherUsers = io.sockets.adapter.rooms.get(roomId);
+      if (otherUsers && otherUsers.size > 1) {
+        // 방에 이미 다른 사용자가 있으면 연결을 시작합니다.
+        socket.emit('other-user', Array.from(otherUsers).find(id => id !== socket.id));
+        socket.to(Array.from(otherUsers).find(id => id !== socket.id)!).emit('user-joined', socket.id);
+      }
+      
       socket.emit('joined-room', roomId);
     } else {
       socket.emit('error', 'Room is not available');
     }
   });
 
+  socket.on('sending-signal', payload => {
+    console.log('Sending signal to', payload.userToSignal);
+    io.to(payload.userToSignal).emit('user-joined', { signal: payload.signal, callerId: payload.callerId });
+  });
+
+  socket.on('returning-signal', payload => {
+    console.log('Returning signal to', payload.callerId);
+    io.to(payload.callerId).emit('receiving-returned-signal', { signal: payload.signal });
+  });
+
   socket.on('disconnect', () => {
     console.log('User disconnected');
+    for (const room in rooms) {
+      if (rooms.hasOwnProperty(room)) {
+        const roomUsers = io.sockets.adapter.rooms.get(room);
+        if (roomUsers && roomUsers.size === 0) {
+          delete rooms[room];
+        }
+      }
+    }
   });
 });
 
