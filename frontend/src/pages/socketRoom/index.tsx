@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
+import styles from './socketRoom.module.scss';
 
 const VideoCall = () => {
   const roomName = "1";
@@ -134,28 +135,34 @@ const VideoCall = () => {
   }, []);
 
   return (
-    <div>
-      <video
-        id="myVideo"
-        style={{
-          width: 240,
-          height: 240,
-          backgroundColor: "black",
-        }}
-        ref={myVideoRef}
-        autoPlay
-        muted
-      />
-      <video
-        id="remoteVideo"
-        style={{
-          width: 240,
-          height: 240,
-          backgroundColor: "black",
-        }}
-        ref={remoteVideoRef}
-        autoPlay
-      />
+    <div className={styles.template}>
+      <div className={styles.template__video}>
+        <div className={styles.template__remote}>
+          <div className={styles.template__title}>진료 대상자 화면</div>
+          <video
+            id="remoteVideo"
+            className={styles.remoteVideo}
+            ref={remoteVideoRef}
+            autoPlay
+          />
+        </div>
+        <div className={styles.template__my}>
+          <div>
+          <div className={styles.template__title}>본인 화면</div>
+          <video
+            id="myVideo"
+            className={styles.myVideo}
+            ref={myVideoRef}
+            autoPlay
+            muted
+          />
+          </div>
+        </div>
+      </div>
+      <div className={styles.template__chat}>
+        <div className={styles.template__title}>채팅창</div>
+        <div></div>
+      </div>
     </div>
   );
 };
