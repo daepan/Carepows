@@ -11,9 +11,9 @@
   "author": "murpin",
   "license": "ISC",
   "dependencies": {
-    "@types/socket.io": "^3.0.2",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "socket.io": "^4.7.5",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
