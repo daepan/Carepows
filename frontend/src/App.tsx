@@ -25,7 +25,7 @@ function App() {
         <Route path="/reserve" element={<ReserveDoctor />} />
         <Route path="/doctorDetail" element={<DoctorDetail />} />
         <Route path="/room" element={<SocketRoom />} />
-        <Route path="/reserveDetail" element={<Reserve />} />
+        <Route path="/reserveDetail/:doctorId" element={<Reserve />} />
       </Route>
     </Routes>
   );

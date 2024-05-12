@@ -1,4 +1,3 @@
-import useParamsHandler from "utils/hooks/useParamsHandler";
 import styles from "./reserveDoctor.module.scss";
 import { useNavigate } from "react-router-dom";
 
@@ -33,12 +32,10 @@ const doctors = [
 ];
 
 export default function ReserveDoctor() {
-  const { setParams } = useParamsHandler();
   const navigate = useNavigate();
   const onClickDoctorCard = (e: React.MouseEvent<HTMLDivElement>, id: number) => {
     e.preventDefault();
-    setParams("doctorId", id.toString(), { deleteBeforeParam: true, replacePage: false });
-    navigate("/reserveDetail");
+    navigate(`/reserveDetail/${id}`, { state: { doctorId: id }});
   }
   return (
     <div className={styles.template}>
