@@ -5,7 +5,7 @@ import cn from "../../utils/ts/clsssNames";
 import styles from "./detect.module.scss";
 
 const Detect: React.FC = () => {
-  const { selectedImage, setSelectedImage } = useImage();
+  const { selectedImage, setSelectedImage, setDiseaseInfo } = useImage();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -35,16 +35,43 @@ const Detect: React.FC = () => {
     }
   };
 
-  const clearImage = (): void => {
+  const clearImage = () => {
     if (selectedImage) {
       URL.revokeObjectURL(selectedImage.preview);
       setSelectedImage(null);
     }
   };
 
-  const onClickSubmit = (e: React.MouseEvent<HTMLButtonElement>): void => {
+  const onClickSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsLoading(true); // 로딩 시작
+    
+    try {
+      if (selectedImage === null) {
+        setIsLoading(false); // 로딩 종료
+        alert("이미지가 없습니다.");
+        return;
+      }
+      console.log(selectedImage);
+      const response = await fetch("http://3.34.162.99:5000/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image: selectedImage.file,
+        }),
+      });
+      const data = await response.json();
+      console.log(data);
+      clearImage();
+      setDiseaseInfo(data);
+      setIsLoading(false); // 로딩 종료
+      navigate("/location"); // 페이지 이동
+      return;
+    } catch (e) {
+      console.error(e);
+    }
     setTimeout(() => {
       setIsLoading(false); // 로딩 종료
       navigate("/location"); // 페이지 이동

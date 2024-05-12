@@ -1,4 +1,6 @@
+import useParamsHandler from "utils/hooks/useParamsHandler";
 import styles from "./reserveDoctor.module.scss";
+import { useNavigate } from "react-router-dom";
 
 const doctors = [
   {
@@ -31,6 +33,13 @@ const doctors = [
 ];
 
 export default function ReserveDoctor() {
+  const { setParams } = useParamsHandler();
+  const navigate = useNavigate();
+  const onClickDoctorCard = (e: React.MouseEvent<HTMLDivElement>, id: number) => {
+    e.preventDefault();
+    setParams("doctorId", id.toString(), { deleteBeforeParam: true, replacePage: false });
+    navigate("/reserveDetail");
+  }
   return (
     <div className={styles.template}>
       <div className={styles.header}>
@@ -41,7 +50,7 @@ export default function ReserveDoctor() {
       </div>
       <div className={styles.list}>
         {doctors.map((item) => (
-          <div className={styles.list__item} key={item.id}>
+          <div className={styles.list__item} key={item.id} onClick={(e) => onClickDoctorCard(e, item.id)}>
             <div className={styles.list__name}>{item.name} 수의사님</div>
             <div className={styles.list__content}>
               <div className={styles.list__describe}>{item.describe}</div>

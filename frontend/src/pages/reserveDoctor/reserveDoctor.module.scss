@@ -1,1 +1,64 @@
 @use "src/utils/scss/media" as media;
+
+.template {
+  width: 100vw;
+  height: calc(100vh - 275px);
+  display: flex;
+  background-color: #FFF;
+  flex-direction: column;
+  font-family: Pretendard;
+  padding: 50px;
+
+  &__list {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+.header {
+  width: 100%;
+  height: 125px;
+
+  &__title {
+    font-size: 36px;
+    font-weight: 600;
+  }
+
+  &__description { 
+    font-size: 24px;
+    font-weight: 500;
+  }
+}
+
+.list {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &__item {
+    width: calc(100vw - 400px);
+    height: 85px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    margin-bottom: 24px;
+  }
+
+  &__name {
+    font-size: 20px;
+    font-size: 400;
+    margin-bottom: 8px;
+  }
+
+  &__content {
+    font-size: 18px;
+    font-size: 300;
+    display: flex;
+    flex-direction: column;
+  }
+}

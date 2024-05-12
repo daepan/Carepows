@@ -1,40 +1,8 @@
-import { setCookie, getCookie } from "../../utils/ts/cookie";
+import { setCookie, getCookie } from "utils/ts/cookie";
+import { TIME } from "utils/constant";
+import cn from "utils/ts/clsssNames";
+import { isPastEndTime } from "utils/ts/isPastEndTime";
 import styles from "./reserve.module.scss";
-
-const TIME = [
-  {
-    startTime: "9:00",
-    endTime: "10:00",
-  },
-  {
-    startTime: "10:00",
-    endTime: "11:00",
-  },
-  {
-    startTime: "11:00",
-    endTime: "12:00",
-  },
-  {
-    startTime: "12:00",
-    endTime: "13:00",
-  },
-  {
-    startTime: "14:00",
-    endTime: "15:00",
-  },
-  {
-    startTime: "15:00",
-    endTime: "16:00",
-  },
-  {
-    startTime: "16:00",
-    endTime: "17:00",
-  },
-  {
-    startTime: "17:00",
-    endTime: "18:00",
-  },
-];
 
 const isReserve = () => {
   if (getCookie("endTime") && getCookie("startTime")) {
@@ -54,6 +22,7 @@ export default function Reserve() {
     <div className={styles.template}>
       <div className={styles.template__content}>
         <div className={styles.title}>현재 예약 현황</div>
+        <div className={styles.content}>
         <div className={styles.content__list}>
           {TIME.map((time) => (
             <div className={styles.content__item}>
@@ -61,7 +30,10 @@ export default function Reserve() {
                 {time.startTime} ~ {time.endTime}
               </div>
               <button
-                className={styles.reserve}
+                className={cn({
+                  [styles.content__reserve]: true,
+                  [styles['content__reserve--disabled']]: isPastEndTime(time.endTime) || getCookie("isReserve") !== undefined,
+                })}
                 disabled={isReserve()}
                 onClick={() => onClickReserve(time.startTime, time.endTime)}
               >
@@ -69,6 +41,7 @@ export default function Reserve() {
               </button>
             </div>
           ))}
+        </div>
         </div>
       </div>
     </div>
