@@ -20,7 +20,9 @@ export default function Reserve() {
 
   const onClickReserve = (e: React.MouseEvent<HTMLButtonElement>, startTime: string, endTime: string) => {
     e.preventDefault();
-    if (!isReserve()) {
+    if (isPastEndTime(endTime)) {
+      alert('예약할 수 있는 시간이 아닙니다.');
+    } else if (!isReserve()) {
       setCookie("reservestartTime", startTime, 1);
       setCookie("reserveendTime", endTime, 1);
       setCookie("isReserve", true, 1);
