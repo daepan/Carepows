@@ -47,35 +47,41 @@ const Detect: React.FC = () => {
     setIsLoading(true); // 로딩 시작
     
     try {
-      if (selectedImage === null) {
-        setIsLoading(false); // 로딩 종료
-        alert("이미지가 없습니다.");
-        return;
-      }
-      console.log(selectedImage);
-      const response = await fetch("http://3.34.162.99:5000/predict", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          image: selectedImage.file,
-        }),
-      });
-      const data = await response.json();
-      console.log(data);
-      clearImage();
-      setDiseaseInfo(data);
-      setIsLoading(false); // 로딩 종료
-      navigate("/location"); // 페이지 이동
-      return;
-    } catch (e) {
-      console.error(e);
-    }
-    setTimeout(() => {
-      setIsLoading(false); // 로딩 종료
-      navigate("/location"); // 페이지 이동
-    }, 2000); // 2초 후 실행
+  if (selectedImage === null) {
+    setIsLoading(false); // 로딩 종료
+    alert("이미지가 없습니다.");
+    return;
+  }
+  console.log(selectedImage);
+
+  // FormData 객체 생성
+  const formData = new FormData();
+  formData.append('image', selectedImage.file);
+
+  const response = await fetch("http://3.34.162.99:5000/predict", {
+    method: "POST",
+    body: formData,  // FormData를 body로 설정
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  const data = await response.json();
+  console.log(data);
+  setDiseaseInfo(data);
+  setIsLoading(false); // 로딩 종료
+  navigate("/location"); // 페이지 이동
+  return;
+} catch (e) {
+  console.error(e);
+  setIsLoading(false); // 로딩 종료
+  alert("예상치 못한 오류가 발생했습니다.");
+}
+setTimeout(() => {
+  setIsLoading(false); // 로딩 종료
+  navigate("/location"); // 페이지 이동
+}, 2000); // 2초 후 실행
   };
 
   return (

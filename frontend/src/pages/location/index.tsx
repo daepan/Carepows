@@ -6,7 +6,7 @@ import styles from "./location.module.scss";
 
 export default function Location() {
   const { selectedImage, diseaseInfo } = useImage();
-
+  console.log(diseaseInfo);
   return (
     <div className={styles.template}>
       <div className={styles.template__location}>
@@ -30,13 +30,26 @@ export default function Location() {
           <br />
           {
             diseaseInfo && (
-              <div className={styles.result__title}>
-                진단 결과: {diseaseInfo[0].confidence >= 50 ? `${diseaseInfo[0].name} (${diseaseInfo[0].confidence})` : `특이사항 없음(${diseaseInfo[0].confidence})`}
+              diseaseInfo?.map((info) => (
+                <div className={styles.result__title} key={info.confidence}>
+                  진단 결과: {info.confidence >= 0.5 ? `${DISEASE_DESCRIPTION[info.class].name} (${info.confidence})` : `질병 확률 낮음(${info.confidence})`}
                 <div className={styles.result__description}>
                   {
-                    DISEASE_DESCRIPTION[diseaseInfo[0].class].describe
+                    info.class ? (
+                      DISEASE_DESCRIPTION[info.class].describe
+                    ) : (
+                      '테스테스ㅌ세ㅡ테스ㅔㅌ슽슷트ㅔㅌ'
+                    )
                   }
                 </div>
+              </div>
+              ))
+            )
+          }
+          {
+            diseaseInfo?.length === 0 && (
+              <div className={styles.result__title}>
+                진단 결과: 사진 내 질병 확인 불가 / 병 확률 낮음(0)
               </div>
             )
           }
