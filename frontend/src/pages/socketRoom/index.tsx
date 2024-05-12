@@ -1,14 +1,12 @@
-import { useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 
 const VideoCall = () => {
+  const roomName = "1";
   const socketRef = useRef<Socket>();
   const myVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const pcRef = useRef<RTCPeerConnection>();
-
-  const { roomName } = useParams();
 
   const getMedia = async () => {
     try {
@@ -36,12 +34,11 @@ const VideoCall = () => {
             return;
           }
           console.log("recv candidate");
-          socketRef.current.emit("candidate", e.candidate, roomName);
+          socketRef.current.emit("send_ice", e.candidate, roomName);
         }
       };
 
       pcRef.current.ontrack = (e) => {
-        console.log(remoteVideoRef);
         if (remoteVideoRef.current) {
           remoteVideoRef.current.srcObject = e.streams[0];
         }
@@ -60,7 +57,7 @@ const VideoCall = () => {
       const sdp = await pcRef.current.createOffer();
       pcRef.current.setLocalDescription(sdp);
       console.log("sent the offer");
-      socketRef.current.emit("offer", sdp, roomName);
+      socketRef.current.emit("send_offer", sdp, roomName);
     } catch (e) {
       console.error(e);
     }
@@ -78,14 +75,14 @@ const VideoCall = () => {
       pcRef.current.setLocalDescription(answerSdp);
 
       console.log("sent the answer");
-      socketRef.current.emit("answer", answerSdp, roomName);
+      socketRef.current.emit("send_answer", answerSdp, roomName);
     } catch (e) {
       console.error(e);
     }
   };
 
   useEffect(() => {
-    socketRef.current = io("localhost:3000");
+    socketRef.current = io("http://localhost:3000");
 
     pcRef.current = new RTCPeerConnection({
       iceServers: [
@@ -95,18 +92,17 @@ const VideoCall = () => {
       ],
     });
 
-    socketRef.current.on("all_users", (allUsers: Array<{ id: string }>) => {
-      if (allUsers.length > 0) {
-        createOffer();
-      }
+    socketRef.current.on("welcome", () => {
+      console.log("Someone joined");
+      createOffer();
     });
 
-    socketRef.current.on("getOffer", (sdp: RTCSessionDescription) => {
+    socketRef.current.on("receive_offer", (sdp: RTCSessionDescription) => {
       console.log("recv Offer");
       createAnswer(sdp);
     });
 
-    socketRef.current.on("getAnswer", (sdp: RTCSessionDescription) => {
+    socketRef.current.on("receive_answer", (sdp: RTCSessionDescription) => {
       console.log("recv Answer");
       if (!pcRef.current) {
         return;
@@ -114,16 +110,15 @@ const VideoCall = () => {
       pcRef.current.setRemoteDescription(sdp);
     });
 
-    socketRef.current.on("getCandidate", async (candidate: RTCIceCandidate) => {
+    socketRef.current.on("receive_ice", async (candidate: RTCIceCandidate) => {
       if (!pcRef.current) {
         return;
       }
-
       await pcRef.current.addIceCandidate(candidate);
     });
 
-    socketRef.current.emit("join_room", {
-      room: roomName,
+    socketRef.current.emit("enter_room", roomName, () => {
+      console.log("Entered room:", roomName);
     });
 
     getMedia();
@@ -141,27 +136,27 @@ const VideoCall = () => {
   return (
     <div>
       <video
-        id="myvideo"
-    style={{
-      width: 240,
-      height: 240,
-      backgroundColor: "black",
-    }}
-    ref={myVideoRef}
-    autoPlay
-    muted  // 자신의 비디오는 들을 필요가 없으므로 음소거 처리
-  />
-  <video
-    id="remotevideo"
-    style={{
-      width: 240,
-      height: 240,
-      backgroundColor: "black",
-    }}
-    ref={remoteVideoRef}
-    autoPlay
-  />
-</div>
+        id="myVideo"
+        style={{
+          width: 240,
+          height: 240,
+          backgroundColor: "black",
+        }}
+        ref={myVideoRef}
+        autoPlay
+        muted
+      />
+      <video
+        id="remoteVideo"
+        style={{
+          width: 240,
+          height: 240,
+          backgroundColor: "black",
+        }}
+        ref={remoteVideoRef}
+        autoPlay
+      />
+    </div>
   );
 };
 
