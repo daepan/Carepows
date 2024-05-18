@@ -8,8 +8,9 @@ import {
   RadioGroup,
   FormControlLabel,
   Radio,
+  Button,
+  Typography
 } from "@mui/material";
-import Button from "@mui/material/Button";
 import { setCookie } from "utils/ts/cookie";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./doctor.module.scss";
@@ -30,7 +31,7 @@ export default function Login() {
 
   const [userType, setUserType] = useState<string>("유저");
 
-  const fetchDoctor = async (userId: string, password: string) => {
+  const fetchUser = async (userId: string, password: string) => {
     try {
       const response = await fetch("http://localhost:3000/login", {
         method: "POST",
@@ -44,7 +45,13 @@ export default function Login() {
         console.log("Login successful:", data);
         setCookie('name', data.data.name, 1);
         setCookie('id', data.data.id, 1);
-        navigate("/doctorDetail"); // 로그인 성공 시 페이지 이동
+        if (data.data.userType === "doctor") {
+          setCookie('userType', 0, 1);
+          navigate(`/doctorDetail/${data.data.id}`);
+        } else {
+          setCookie('userType', 1, 1);
+          navigate(`/userDetail/${data.data.id}`);
+        }
       } else {
         console.error("Login failed:", data.message);
         alert("로그인 실패: " + data.message);
@@ -63,12 +70,7 @@ export default function Login() {
     const password = loginRef.current.password?.value;
 
     if (userId && password) {
-      if (loginRef.current.isDoctor) {
-        fetchDoctor(userId, password);
-      } else {
-        // 일반 유저 로그인 처리 로직 추가
-        console.log("유저 로그인 로직 추가 필요");
-      }
+      fetchUser(userId, password);
     } else {
       alert("ID와 비밀번호를 모두 입력하세요.");
     }
@@ -82,11 +84,11 @@ export default function Login() {
 
   return (
     <div className={styles.template}>
-      <div className={styles.title}>
+      <Typography variant="h4" className={styles.title}>
         CarePaws 로그인
-      </div>
+      </Typography>
       <div className={styles.content}>
-      <FormControl>
+        <FormControl>
           <FormLabel id="user-type-radio-buttons-group">User Type</FormLabel>
           <RadioGroup
             aria-labelledby="user-type-radio-buttons-group"
@@ -124,7 +126,9 @@ export default function Login() {
             비밀번호를 입력하세요
           </FormHelperText>
         </FormControl>
-        <Link to="/register" className={styles.register}>혹시 아직 계정이 없으신가요?</Link>
+        <br />
+        <Link to="/register" className={styles.register}>아직 계정이 없으신가요?</Link>
+        <br />
         <Button
           className={styles.submit}
           onClick={(e) => onSubmit(e)}

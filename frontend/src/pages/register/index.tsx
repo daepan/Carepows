@@ -5,14 +5,23 @@ import {
   InputLabel,
   FormHelperText,
   Button,
-  Typography
+  Typography,
+  Select,
+  MenuItem
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import styles from './Register.module.scss';
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const [describe, setDescribe] = useState("");
+  const [location, setLocation] = useState("");
+  const [userType, setUserType] = useState("user");
+  const navigate = useNavigate();
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -46,13 +55,14 @@ export default function Register() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: email, password }),
+        body: JSON.stringify({ userId: email, password, name, number, describe, location, userType }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
         alert("회원가입이 완료되었습니다.");
+        navigate('/login');
       } else {
         alert(`회원가입 실패: ${data.message}`);
       }
@@ -106,6 +116,63 @@ export default function Register() {
           <FormHelperText id="confirm-password-helper-text">
             비밀번호를 다시 입력하세요
           </FormHelperText>
+        </FormControl>
+        <br />
+        <FormControl className={styles.input} fullWidth>
+          <InputLabel htmlFor="name-input">이름</InputLabel>
+          <Input
+            id="name-input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            aria-describedby="name-helper-text"
+          />
+          <FormHelperText id="name-helper-text">이름을 입력하세요</FormHelperText>
+        </FormControl>
+        <br />
+        <FormControl className={styles.input} fullWidth>
+          <InputLabel htmlFor="number-input">전화번호</InputLabel>
+          <Input
+            id="number-input"
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+            aria-describedby="number-helper-text"
+          />
+          <FormHelperText id="number-helper-text">전화번호를 입력하세요</FormHelperText>
+        </FormControl>
+        <br />
+        <FormControl className={styles.input} fullWidth>
+          <InputLabel htmlFor="describe-input">설명</InputLabel>
+          <Input
+            id="describe-input"
+            value={describe}
+            onChange={(e) => setDescribe(e.target.value)}
+            aria-describedby="describe-helper-text"
+          />
+          <FormHelperText id="describe-helper-text">설명을 입력하세요</FormHelperText>
+        </FormControl>
+        <br />
+        <FormControl className={styles.input} fullWidth>
+          <InputLabel htmlFor="location-input">위치</InputLabel>
+          <Input
+            id="location-input"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            aria-describedby="location-helper-text"
+          />
+          <FormHelperText id="location-helper-text">위치를 입력하세요</FormHelperText>
+        </FormControl>
+        <br />
+        <FormControl className={styles.input} fullWidth>
+          <InputLabel htmlFor="userType-input">사용자 유형</InputLabel>
+          <br />
+          <Select
+            id="userType-input"
+            value={userType}
+            onChange={(e) => setUserType(e.target.value as string)}
+          >
+            <MenuItem value="user">일반 사용자</MenuItem>
+            <MenuItem value="doctor">수의사</MenuItem>
+          </Select>
         </FormControl>
         <br />
         <Button

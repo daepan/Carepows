@@ -11,6 +11,7 @@ import Register from 'pages/register';
 import ReserveDoctor from './pages/reserveDoctor';
 import DoctorDetail from './pages/doctorDetail';
 import SocketRoom from './pages/socketRoom';
+import UserDetail from 'pages/userDetail';
 import Reserve from './pages/reserve';
 import './fonts.css';
 import './App.css';
@@ -24,6 +25,7 @@ function App() {
         <Route path="/location" element={<Location />} />
         <Route path="/login" element={<Doctor />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/userDetail/:id" element={<UserDetail />} />
         <Route path="/reserve" element={<ReserveDoctor />} />
         <Route path="/doctorDetail" element={<DoctorDetail />} />
         <Route path="/room" element={<SocketRoom />} />

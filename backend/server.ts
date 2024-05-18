@@ -11,34 +11,18 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import { Lucia } from "lucia";
 import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
+import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
+import { sessionTable, users } from "./schema.ts";
 import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
+
 const __dirname = import.meta.dirname;
 const sqliteDB = new Database(process.env.SQLITE_DB_PATH ? path.join(__dirname, process.env.SQLITE_DB_PATH) : ":memory:?cache=shared",{
   fileMustExist: true
 });
 const db = drizzle(sqliteDB);
-
-const users = sqliteTable("users", {
-  id: text("id").notNull().primaryKey(),
-  userId: text("user_id").notNull().unique(),
-  password: text("password").notNull(),
-  name: text("name").notNull(),
-  number: text("number"),
-  describe: text("describe"),
-  location: text("location"),
-  userType: text("user_type").notNull(),
-  diagnosisRecords: text("diagnosis_records").default('[]')
-});
-
-const sessionTable = sqliteTable("session", {
-  id: text("id").notNull().primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id),
-  expiresAt: integer("expires_at").notNull()
-});
+migrate(db, { migrationsFolder: path.join(__dirname, './migrations-folder')})
 
 const adapter = new DrizzleSQLiteAdapter(db, sessionTable, users);
 const app = express();

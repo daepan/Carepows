@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "nodemon server.ts"
+    "server": "node --loader ts-node/esm server.ts",
+    "prepare": "drizzle-kit generate --dialect sqlite --out migrations-folder --schema schema.ts"
   },
   "keywords": [],
   "author": "murpin",
