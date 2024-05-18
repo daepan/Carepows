@@ -1,12 +1,11 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { 
   FormControl,
   Input,
   InputLabel,
   FormHelperText,
   Button,
-  Typography,
-  TextField
+  Typography
 } from "@mui/material";
 import styles from './Register.module.scss';
 
@@ -14,11 +13,6 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [emailVerified, setEmailVerified] = useState(false);
-  const [verificationCode, setVerificationCode] = useState("");
-  const [inputCode, setInputCode] = useState("");
-  const [timer, setTimer] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const validateEmail = (email: string) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,34 +24,7 @@ export default function Register() {
     return re.test(password);
   };
 
-  const startTimer = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    setTimer(300); // 5분 = 300초
-    timerRef.current = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1 && timerRef.current) {
-          clearInterval(timerRef.current);
-          timerRef.current = null;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const handleEmailVerification = () => {
-    if (validateEmail(email)) {
-      // 이메일 인증 요청 로직 추가
-      setVerificationCode("123456"); // 예시 코드, 실제로는 서버에서 생성
-      startTimer();
-      alert("인증번호가 전송되었습니다. 5분 이내에 입력해주세요.");
-    } else {
-      alert("유효한 이메일 주소를 입력하세요.");
-    }
-  };
-
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (password !== confirmPassword) {
       alert("비밀번호가 일치하지 않습니다.");
       return;
@@ -68,13 +35,31 @@ export default function Register() {
       return;
     }
 
-    if (verificationCode !== inputCode) {
-      alert("인증번호가 일치하지 않습니다.");
+    if (!validateEmail(email)) {
+      alert("유효한 이메일 주소를 입력하세요.");
       return;
     }
 
-    // 회원가입 요청 로직 추가
-    alert("회원가입이 완료되었습니다.");
+    try {
+      const response = await fetch("http://localhost:3000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("회원가입이 완료되었습니다.");
+      } else {
+        alert(`회원가입 실패: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      alert("네트워크 오류로 인해 회원가입에 실패했습니다.");
+    }
   };
 
   return (
@@ -93,24 +78,6 @@ export default function Register() {
             aria-describedby="email-helper-text"
           />
           <FormHelperText id="email-helper-text">이메일 주소를 입력하세요</FormHelperText>
-          <Button variant="contained" onClick={handleEmailVerification} className={styles.verifyButton}>
-            이메일 인증하기
-          </Button>
-        </FormControl>
-        <br />
-        {timer > 0 && (
-          <Typography variant="caption" className={styles.timer}>
-            인증번호 입력 시간: {Math.floor(timer / 60)}:{timer % 60 < 10 ? `0${timer % 60}` : timer % 60}
-          </Typography>
-        )}
-        <br />
-        <FormControl className={styles.input} fullWidth>
-          <TextField
-            label="인증번호"
-            value={inputCode}
-            onChange={(e) => setInputCode(e.target.value)}
-            disabled={timer <= 0}
-          />
         </FormControl>
         <br />
         <FormControl className={styles.input} fullWidth>
@@ -145,7 +112,6 @@ export default function Register() {
           className={styles.submit}
           onClick={handleRegister}
           variant="contained"
-          disabled={!emailVerified || verificationCode !== inputCode || timer <= 0}
         >
           회원가입
         </Button>
