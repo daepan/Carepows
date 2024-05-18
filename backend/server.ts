@@ -3,7 +3,40 @@ import http from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import cors from 'cors';
 import path from 'path';
+import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle";
+import sqlite from "better-sqlite3";
+import { eq } from "drizzle-orm";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core"; // eq 추가
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import { Lucia } from "lucia";
+import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
 
+dotenv.config();
+
+const sqliteDB = sqlite(process.env.SQLITE_DB_PATH || ":memory:");
+const db = drizzle(sqliteDB);
+
+const userTable = sqliteTable("user", {
+  id: text("id").notNull().primaryKey(),
+  userId: text("user_id").notNull().unique(),
+  password: text("password").notNull(),
+  name: text("name").notNull(),
+  number: text("number"),
+  describe: text("describe"),
+  location: text("location"),
+  diagnosisRecords: text("diagnosis_records").default('[]') // JSON 문자열로 진단 기록 저장
+});
+
+const sessionTable = sqliteTable("session", {
+  id: text("id").notNull().primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => userTable.id),
+  expiresAt: integer("expires_at").notNull()
+});
+
+const adapter = new DrizzleSQLiteAdapter(db, sessionTable, userTable);
 const app = express();
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
@@ -13,6 +46,20 @@ const io = new SocketIOServer(server, {
     credentials: true,
   },
 });
+export const lucia = new Lucia(adapter, {
+  sessionCookie: {
+    attributes: {
+      secure: process.env.NODE_ENV === "production"
+    }
+  }
+});
+
+// IMPORTANT!
+declare module "lucia" {
+  interface Register {
+    Lucia: typeof lucia;
+  }
+}
 
 const corsOptions = {
   origin: '*',
@@ -23,60 +70,148 @@ app.use(cors(corsOptions));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-interface Doctor {
-  id: number;
-  userId: string;
-  password: string;
-  name: string;
-  number: string;
-  describe: string;
-  location: string;
-}
-
-const doctors: Doctor[] = [
-  {
-    id: 1,
-    userId: "qw03011",
-    password: "1234",
-    name: "김대관",
-    number: "042-472-8480",
-    describe: "성실하게 임하겠습니다.",
-    location: "대전패트릭동물병원",
-  },
-  {
-    id: 2,
-    name: "김형진",
-    userId: "hy123",
-    password: "1234",
-    number: "041-422-8610",
-    describe: "잘 임하겠습니다.",
-    location: "서울진사동물병원",
-  },
-  {
-    id: 3,
-    name: "전민서",
-    userId: "ms123",
-    password: "1234",
-    number: "02-725-8508",
-    describe: "열심히 임하겠습니다.",
-    location: "청주펫케어병원",
-  },
-];
-
-app.post('/login', (req, res) => {
-  const { userId, password } = req.body;
-  const doctor = doctors.find(d => d.userId === userId && d.password === password);
-
-  if (doctor) {
-    res.json({
+app.post('/register', async (req, res) => {
+  const { userId, password, name, number, describe, location } = req.body;
+  try {
+    const existingUser = await db.select().from(userTable).where(eq(userTable.userId, userId)).get();
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: '이미 존재하는 아이디입니다.',
+      });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await db.insert(userTable).values({
+      id: crypto.randomUUID(),
+      userId,
+      password: hashedPassword,
+      name,
+      number,
+      describe,
+      location,
+      diagnosisRecords: JSON.stringify([])
+    }).run();
+    res.status(201).json({
       success: true,
-      message: '로그인 성공!',
-      data: doctor,
+      message: '회원가입 성공!',
     });
-  } else {
-    res.status(401).json({
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
       success: false,
-      message: '아이디 또는 비밀번호가 잘못되었습니다.',
+      message: '서버 오류로 인해 회원가입에 실패했습니다.',
+    });
+  }
+});
+
+app.post('/login', async (req, res) => {
+  const { userId, password } = req.body;
+  try {
+    const user = await db.select().from(userTable).where(eq(userTable.userId, userId)).get();
+    if (user && await bcrypt.compare(password, user.password)) {
+      const session = await lucia.createSession(user.id, {}, { sessionId: undefined });
+      const { password, ...userInfo } = user;
+      userInfo.diagnosisRecords = JSON.parse(userInfo.diagnosisRecords || '[]');
+      res.json({
+        success: true,
+        message: '로그인 성공!',
+        data: userInfo,
+        session,
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: '아이디 또는 비밀번호가 잘못되었습니다.',
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: '서버 오류로 인해 로그인에 실패했습니다.',
+    });
+  }
+});
+
+app.get('/user/:id/diagnosis', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await db.select().from(userTable).where(eq(userTable.id, id)).get();
+    if (user) {
+      const diagnosisRecords = JSON.parse(user.diagnosisRecords || '[]');
+      res.json({
+        success: true,
+        diagnosisRecords,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: '사용자를 찾을 수 없습니다.',
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: '서버 오류로 인해 진단 기록을 가져올 수 없습니다.',
+    });
+  }
+});
+
+app.post('/user/:id/diagnosis', async (req, res) => {
+  const { id } = req.params;
+  const { diagnosis } = req.body;
+  try {
+    const user = await db.select().from(userTable).where(eq(userTable.id, id)).get();
+    if (user) {
+      const diagnosisRecords = JSON.parse(user.diagnosisRecords || '[]');
+      diagnosisRecords.push(diagnosis);
+      await db.update(userTable).set({ diagnosisRecords: JSON.stringify(diagnosisRecords) }).where(eq(userTable.id, user.id)).run();
+      res.json({
+        success: true,
+        message: '진단 기록이 추가되었습니다.',
+        diagnosisRecords,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: '사용자를 찾을 수 없습니다.',
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: '서버 오류로 인해 진단 기록을 추가할 수 없습니다.',
+    });
+  }
+});
+
+app.delete('/user/:id/diagnosis', async (req, res) => {
+  const { id } = req.params;
+  const { diagnosis } = req.body;
+  try {
+    const user = await db.select().from(userTable).where(eq(userTable.id, id)).get();
+    if (user) {
+      let diagnosisRecords = JSON.parse(user.diagnosisRecords || '[]');
+      diagnosisRecords = diagnosisRecords.filter((record: any) => record !== diagnosis);
+      await db.update(userTable).set({ diagnosisRecords: JSON.stringify(diagnosisRecords) }).where(eq(userTable.id, user.id)).run();
+      res.json({
+        success: true,
+        message: '진단 기록이 삭제되었습니다.',
+        diagnosisRecords,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: '사용자를 찾을 수 없습니다.',
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: '서버 오류로 인해 진단 기록을 삭제할 수 없습니다.',
     });
   }
 });
