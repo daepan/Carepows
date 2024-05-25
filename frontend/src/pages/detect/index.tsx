@@ -58,7 +58,7 @@ const Detect: React.FC = () => {
   const formData = new FormData();
   formData.append('image', selectedImage.file);
 
-  const response = await fetch("http://3.34.162.99:5000/predict", {
+  const response = await fetch("https://carepaws-server.n-e.kr/predict", {
     method: "POST",
     body: formData,  // FormData를 body로 설정
   });

@@ -8,6 +8,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  @include media.media-breakpoint(mobile) {
+    width: 100vw; 
+    height: 60px;
+  }
 }
 
 .Logo {
@@ -17,17 +22,37 @@
   margin-left: 40px;
   text-decoration: none;
   color: #000;
+
+  @include media.media-breakpoint(mobile) {
+    width: 20vw;
+    font-size: 24px;
+    margin-left: 20px;
+  }
 }
 
 .item {
-  width: 20vw;
+  width: calc(30vw - 56px);
+  white-space: nowrap;
   display: flex;
+  justify-content: flex-end;
+  padding: 0 24px;
   font-size: 28px;
   font-weight: 500;
+
+  @include media.media-breakpoint(mobile) {
+    width: calc(50vw - 36px);
+    font-size: 20px;
+    padding: 0 12px;
+  }
 
   &__list {
     text-decoration: none;
     margin-right: 20px;
     color: #000;
+    cursor: pointer;
+
+    @include media.media-breakpoint(mobile) {
+      margin-right: 10px;
+    }
   }
 }

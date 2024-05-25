@@ -21,7 +21,7 @@ export default function DoctorDetail() {
 
   return (
     <div className={styles.template}>
-      <div className={styles.template__header}>반갑습니다. {getCookie('name') ? `${getCookie('name')}`:'' } 수의사님</div>
+      <div className={styles.template__header}>반갑습니다. {getCookie('name') ? `${getCookie('name')}`: '김대관' } 수의사님</div>
       <div className={styles.template__content}>
         <div className={styles.create}>
           <button

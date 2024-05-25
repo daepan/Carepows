@@ -17,12 +17,27 @@ interface DiseaseInfo {
 }
 
 function getHighConfidenceDiseaseInfo(diseaseInfos: DiseaseInfo[] | null): DiseaseInfo | undefined {
-  if (diseaseInfos === null) return;
+  console.log(typeof diseaseInfos);
+  if (diseaseInfos === null || diseaseInfos.length === 0) return {
+    xmin: 0,
+    ymin: 0,
+    xmax: 0,
+    ymax: 0,
+    confidence: 0,
+    class: 7,
+    name: "해당 사항 없음",
+  };
+  console.log(diseaseInfos.find(info => info.confidence >= 0.5));
   return diseaseInfos.find(info => info.confidence >= 0.5);
 }
 
+const formatConfidence = (confidence: number): string => {
+  return `${Math.round(confidence * 100)}%`;
+};
+
 export default function Location() {
   const { selectedImage, diseaseInfo } = useImage();
+  console.log(typeof diseaseInfo);
   const highConfidenceDiseaseInfo = getHighConfidenceDiseaseInfo(diseaseInfo);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -31,6 +46,7 @@ export default function Location() {
       const img = new Image();
       img.src = selectedImage.preview;
       img.onload = () => {
+        console.log("Image loaded");
         const canvas = canvasRef.current;
         if (canvas) {
           const ctx = canvas.getContext("2d");
@@ -39,10 +55,11 @@ export default function Location() {
             canvas.height = img.height;
             ctx.drawImage(img, 0, 0);
 
-            // Draw the box
+            // Draw the box with a thicker line
             ctx.strokeStyle = "red";
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 10; // Increase the line width to 5
             const { xmin, ymin, xmax, ymax } = highConfidenceDiseaseInfo;
+            console.log(`Drawing rect: xmin=${xmin}, ymin=${ymin}, xmax=${xmax}, ymax=${ymax}`);
             ctx.strokeRect(xmin, ymin, xmax - xmin, ymax - ymin);
           }
         }
@@ -58,7 +75,15 @@ export default function Location() {
           <div className={styles.location__map}>
             <KakaoMap />
           </div>
-          <Link className={styles.location__reserve} to="/reserve">예약하러 가기</Link>
+          {
+            (highConfidenceDiseaseInfo && highConfidenceDiseaseInfo.confidence >= 0.5) && (
+              <>
+                <h3>불안하시다면, 지금 당장 원격 진료를 예약해보세요!</h3>
+                <Link className={styles.location__reserve} to="/reserve">원격 진료 바로 가기</Link>
+              </>
+            )
+         
+          }
         </div>
       </div>
       <div className={styles.template__result}>
@@ -75,13 +100,13 @@ export default function Location() {
               <div className={cn({
                 [styles.result__title]: true,
               })} key={highConfidenceDiseaseInfo.confidence}>
-                진단 결과: {highConfidenceDiseaseInfo.confidence >= 0.5 ? `${DISEASE_DESCRIPTION[highConfidenceDiseaseInfo.class].name} (${highConfidenceDiseaseInfo.confidence})` : `질병 확률 낮음(${highConfidenceDiseaseInfo.confidence})`}
+                진단 결과: {highConfidenceDiseaseInfo.confidence >= 0.5 ? `${DISEASE_DESCRIPTION[highConfidenceDiseaseInfo.class].name} (${formatConfidence(highConfidenceDiseaseInfo.confidence)})` : `질병 확률 낮음(${formatConfidence(highConfidenceDiseaseInfo.confidence)})`}
                 <div className={styles.result__description}>
                   {
                     highConfidenceDiseaseInfo.class ? (
                       DISEASE_DESCRIPTION[highConfidenceDiseaseInfo.class].describe
                     ) : (
-                      '테스테스ㅌ세ㅡ테스ㅔㅌ슽슷트ㅔㅌ'
+                      '테스트 설명'
                     )
                   }
                 </div>

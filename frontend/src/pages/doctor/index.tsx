@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { 
   FormControl,
   Input,
@@ -11,9 +11,10 @@ import {
   Button,
   Typography
 } from "@mui/material";
-import { setCookie } from "utils/ts/cookie";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "components/context/AuthContext";
 import styles from "./doctor.module.scss";
+import { setCookie } from "utils/ts/cookie";
 
 interface IClassUser {
   userId: HTMLInputElement | null;
@@ -23,7 +24,8 @@ interface IClassUser {
 
 export default function Login() {
   const navigate = useNavigate();
-  const loginRef = React.useRef<IClassUser>({
+  const { setLogin } = useAuth();
+  const loginRef = useRef<IClassUser>({
     userId: null,
     password: null,
     isDoctor: false,
@@ -33,7 +35,7 @@ export default function Login() {
 
   const fetchUser = async (userId: string, password: string) => {
     try {
-      const response = await fetch("http://localhost:3000/login", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,13 +45,11 @@ export default function Login() {
       const data = await response.json();
       if (response.ok) {
         console.log("Login successful:", data);
+        setLogin(true, data.data.userType, data.data.id);
         setCookie('name', data.data.name, 1);
-        setCookie('id', data.data.id, 1);
         if (data.data.userType === "doctor") {
-          setCookie('userType', 0, 1);
           navigate(`/doctorDetail/${data.data.id}`);
         } else {
-          setCookie('userType', 1, 1);
           navigate(`/userDetail/${data.data.id}`);
         }
       } else {

@@ -50,7 +50,7 @@ export default function Register() {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/register", {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -141,14 +141,14 @@ export default function Register() {
         </FormControl>
         <br />
         <FormControl className={styles.input} fullWidth>
-          <InputLabel htmlFor="describe-input">설명</InputLabel>
+          <InputLabel htmlFor="describe-input">반려견</InputLabel>
           <Input
             id="describe-input"
             value={describe}
             onChange={(e) => setDescribe(e.target.value)}
             aria-describedby="describe-helper-text"
           />
-          <FormHelperText id="describe-helper-text">설명을 입력하세요</FormHelperText>
+          <FormHelperText id="describe-helper-text">기르는 반려견의 견종을 적어주세요</FormHelperText>
         </FormControl>
         <br />
         <FormControl className={styles.input} fullWidth>

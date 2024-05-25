@@ -1,0 +1,91 @@
+@use "src/utils/scss/media" as media;
+
+.template {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  width: 100vw;
+  background-color: #FFF;
+}
+
+.title {
+  color: #000;
+  font-size: 48px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+.input {
+  margin-bottom: 40px;
+}
+
+.submit {
+  margin-top: 20px;
+}
+
+.email {
+  display: flex;
+}
+
+.template {
+  padding: 20px;
+}
+
+.title {
+  margin-bottom: 20px;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reportContainer {
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 800px;
+}
+
+.report {
+  border: 1px solid #ccc;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+}
+
+.reportTitle {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.reportSection {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.sectionLabel {
+  flex: 0 0 150px;
+  background-color: #e0f7fa;
+  padding: 10px;
+  border-right: 1px solid #ccc;
+}
+
+.sectionContent {
+  flex: 1;
+  padding: 10px;
+}
+
+.downloadButton,
+.backButton {
+  margin-top: 20px;
+  margin-right: 10px;
+}

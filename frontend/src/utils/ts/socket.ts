@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const SERVER_URL = 'http://localhost:3000';
+const SERVER_URL = `${process.env.REACT_APP_API_BASE_URL}`;
 
 export const socket = io(SERVER_URL,  {
   transports: ['websocket'],

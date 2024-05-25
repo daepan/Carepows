@@ -1,12 +1,13 @@
+// 서버 코드 (예시)
 import express from 'express';
 import http from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import cors from 'cors';
-import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle";
 import Database from 'better-sqlite3';
 import { eq } from "drizzle-orm";
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { Lucia } from "lucia";
 import bcrypt from 'bcrypt';
@@ -14,15 +15,20 @@ import dotenv from 'dotenv';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { sessionTable, users } from "./schema.ts";
 import { v4 as uuidv4 } from 'uuid';
+import { webcrypto } from "node:crypto";
 
+globalThis.crypto = webcrypto as Crypto;
 dotenv.config();
 
-const __dirname = import.meta.dirname;
-const sqliteDB = new Database(process.env.SQLITE_DB_PATH ? path.join(__dirname, process.env.SQLITE_DB_PATH) : ":memory:?cache=shared",{
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const sqliteDBPath = process.env.SQLITE_DB_PATH || ":memory:?cache=shared";
+const sqliteDB = new Database(join(__dirname, sqliteDBPath), {
   fileMustExist: true
 });
 const db = drizzle(sqliteDB);
-migrate(db, { migrationsFolder: path.join(__dirname, './migrations-folder')})
+migrate(db, { migrationsFolder: join(__dirname, './migrations-folder')})
 
 const adapter = new DrizzleSQLiteAdapter(db, sessionTable, users);
 const app = express();
@@ -54,10 +60,12 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(join(__dirname, 'public')));
 app.use(express.json());
 
-app.post('/register', async (req, res) => {
+const apiRouter = express.Router();
+
+apiRouter.post('/register', async (req, res) => {
   const { userId, password, name, number, describe, location, userType } = req.body;
   try {
     const existingUser = await db.select().from(users).where(eq(users.userId, userId)).get();
@@ -92,7 +100,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-app.post('/login', async (req, res) => {
+apiRouter.post('/login', async (req, res) => {
   const { userId, password } = req.body;
   try {
     const user = await db.select().from(users).where(eq(users.userId, userId)).get();
@@ -121,7 +129,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.get('/user/:id/diagnosis', async (req, res) => {
+apiRouter.get('/user/:id/diagnosis', async (req, res) => {
   const { id } = req.params;
   try {
     const user = await db.select().from(users).where(eq(users.id, id)).get();
@@ -129,7 +137,16 @@ app.get('/user/:id/diagnosis', async (req, res) => {
       const diagnosisRecords = JSON.parse(user.diagnosisRecords || '[]');
       res.json({
         success: true,
-        diagnosisRecords,
+        user: {
+          id: user.id,
+          userId: user.userId,
+          name: user.name,
+          number: user.number,
+          describe: user.describe,
+          location: user.location,
+          userType: user.userType,
+          diagnosisRecords: diagnosisRecords,
+        }
       });
     } else {
       res.status(404).json({
@@ -146,7 +163,7 @@ app.get('/user/:id/diagnosis', async (req, res) => {
   }
 });
 
-app.post('/user/:id/diagnosis', async (req, res) => {
+apiRouter.post('/user/:id/diagnosis', async (req, res) => {
   const { id } = req.params;
   const { diagnosis } = req.body;
   try {
@@ -175,7 +192,7 @@ app.post('/user/:id/diagnosis', async (req, res) => {
   }
 });
 
-app.delete('/user/:id/diagnosis', async (req, res) => {
+apiRouter.delete('/user/:id/diagnosis', async (req, res) => {
   const { id } = req.params;
   const { diagnosis } = req.body;
   try {
@@ -204,18 +221,21 @@ app.delete('/user/:id/diagnosis', async (req, res) => {
   }
 });
 
+app.use('/api', apiRouter);
+
 interface CustomSocket extends Socket {
+  userId?: string;
   nickname?: string;
 }
 
 io.on("connection", (socket: CustomSocket) => {
   console.log(`User connected: ${socket.id}`);
-  socket.nickname = "Anonymous";
-
-  socket.on("enter_room", (roomName: string, done: Function) => {
+  
+  socket.on("enter_room", (roomName: string, userId: string, done: Function) => {
     socket.join(roomName);
+    socket.userId = userId; // 소켓에 userId 저장
     done();
-    socket.to(roomName).emit("welcome");
+    socket.to(roomName).emit("welcome", userId);
   });
 
   socket.on("set_nickname", (nickname: string) => {
@@ -232,6 +252,24 @@ io.on("connection", (socket: CustomSocket) => {
 
   socket.on("send_ice", (ice: RTCIceCandidate, roomName: string) => {
     socket.to(roomName).emit("receive_ice", ice);
+  });
+
+  socket.on("add_diagnosis", async (data, callback) => {
+    const { userId, diagnosis } = data;
+    try {
+      const user = await db.select().from(users).where(eq(users.id, userId)).get();
+      if (user) {
+        const diagnosisRecords = JSON.parse(user.diagnosisRecords || '[]');
+        diagnosisRecords.push(diagnosis);
+        await db.update(users).set({ diagnosisRecords: JSON.stringify(diagnosisRecords) }).where(eq(users.id, user.id)).run();
+        callback({ success: true, message: '진단 기록이 추가되었습니다.' });
+      } else {
+        callback({ success: false, message: '사용자를 찾을 수 없습니다.' });
+      }
+    } catch (error) {
+      console.error(error);
+      callback({ success: false, message: '서버 오류로 인해 진단 기록을 추가할 수 없습니다.' });
+    }
   });
 
   socket.on("disconnect", () => {
