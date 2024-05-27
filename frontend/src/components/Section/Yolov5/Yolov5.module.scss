@@ -9,25 +9,52 @@
   align-items: center;
   background-color: #FFF;
 
+  @include media.media-breakpoint(mobile) {
+    flex-direction: column;
+    width: calc(100vw - 40px);
+    height: auto;
+    padding: 20px;
+  }
+
   &__content {
     width: 700px;
     display: flex;
     flex-direction: column;
     margin-right: 20px;
-    font-family: Pretedard;
+    font-family: Pretendard;
+
+    @include media.media-breakpoint(mobile) {
+      width: 100%;
+      margin-right: 0;
+      margin-bottom: 20px;
+    }
   }
 
   &__image {
     width: 475px;
     height: 350px;
+    border-radius: 20px;
+
+    @include media.media-breakpoint(mobile) {
+      width: 100%;
+      height: auto;
+    }
   }
 }
 
 .title {
   font-weight: 800;
+
+  @include media.media-breakpoint(mobile) {
+    text-align: center;
+  }
 }
 
 .desciprtion {
   font-weight: 500;
   font-size: 18px;
+
+  @include media.media-breakpoint(mobile) {
+    font-size: 16px;
+  }
 }

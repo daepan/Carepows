@@ -42,7 +42,7 @@ export default function ReserveDoctor() {
       <div className={styles.header}>
         <div className={styles.header__title}>의료진 예약하기</div>
         <div className={styles.header__description}>
-          Carepows의 원격 의료진을 소개합니다.
+          CarePaws의 원격 의료진을 소개합니다.
         </div>
       </div>
       <div className={styles.list}>

@@ -69,23 +69,6 @@ export default function Location() {
 
   return (
     <div className={styles.template}>
-      <div className={styles.template__location}>
-        <div className={styles.location}>
-          <div className={styles.location__title}>주변 동물병원 위치</div>
-          <div className={styles.location__map}>
-            <KakaoMap />
-          </div>
-          {
-            (highConfidenceDiseaseInfo && highConfidenceDiseaseInfo.confidence >= 0.5) && (
-              <>
-                <h3>불안하시다면, 지금 당장 원격 진료를 예약해보세요!</h3>
-                <Link className={styles.location__reserve} to="/reserve">원격 진료 바로 가기</Link>
-              </>
-            )
-         
-          }
-        </div>
-      </div>
       <div className={styles.template__result}>
         <div className={styles.result}>
           {selectedImage && (
@@ -100,11 +83,11 @@ export default function Location() {
               <div className={cn({
                 [styles.result__title]: true,
               })} key={highConfidenceDiseaseInfo.confidence}>
-                진단 결과: {highConfidenceDiseaseInfo.confidence >= 0.5 ? `${DISEASE_DESCRIPTION[highConfidenceDiseaseInfo.class].name} (${formatConfidence(highConfidenceDiseaseInfo.confidence)})` : `질병 확률 낮음(${formatConfidence(highConfidenceDiseaseInfo.confidence)})`}
+                진단 결과: {highConfidenceDiseaseInfo.confidence >= 0.5 ? `${DISEASE_DESCRIPTION[Number(highConfidenceDiseaseInfo.name)].name} (${formatConfidence(highConfidenceDiseaseInfo.confidence)})` : `질병 확률 낮음(${formatConfidence(highConfidenceDiseaseInfo.confidence)})`}
                 <div className={styles.result__description}>
                   {
-                    highConfidenceDiseaseInfo.class ? (
-                      DISEASE_DESCRIPTION[highConfidenceDiseaseInfo.class].describe
+                    highConfidenceDiseaseInfo.name ? (
+                      DISEASE_DESCRIPTION[Number(highConfidenceDiseaseInfo.name)].describe
                     ) : (
                       '테스트 설명'
                     )
@@ -119,6 +102,23 @@ export default function Location() {
                 진단 결과: 사진 내 질병 확인 불가 / 병 확률 낮음(0)
               </div>
             )
+          }
+        </div>
+      </div>
+      <div className={styles.template__location}>
+        <div className={styles.location}>
+          <div className={styles.location__title}>주변 동물병원 위치</div>
+          <div className={styles.location__map}>
+            <KakaoMap />
+          </div>
+          {
+            (highConfidenceDiseaseInfo && highConfidenceDiseaseInfo.confidence >= 0.5) && (
+              <>
+                <h3>불안하시다면, 지금 당장 원격 진료를 예약해보세요!</h3>
+                <Link className={styles.location__reserve} to="/reserve">원격 진료 바로 가기</Link>
+              </>
+            )
+         
           }
         </div>
       </div>

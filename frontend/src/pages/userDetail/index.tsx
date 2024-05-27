@@ -135,7 +135,7 @@ export default function UserDetail() {
                 <div className={styles.reportSection}>
                   <div className={styles.sectionLabel}>발행기관</div>
                   <div className={styles.sectionContent}>
-                    <Typography>기관: Carepaws</Typography>
+                    <Typography>기관: 한국동물병원</Typography>
                     <Typography>담당 의사: {record.doctor}</Typography>
                   </div>
                 </div>

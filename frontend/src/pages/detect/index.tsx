@@ -9,6 +9,7 @@ const Detect: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+
   const handleUpload = (file: File): void => {
     setSelectedImage({
       preview: URL.createObjectURL(file),
@@ -45,43 +46,38 @@ const Detect: React.FC = () => {
   const onClickSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsLoading(true); // 로딩 시작
-    
+
     try {
-  if (selectedImage === null) {
-    setIsLoading(false); // 로딩 종료
-    alert("이미지가 없습니다.");
-    return;
-  }
-  console.log(selectedImage);
+      if (selectedImage === null) {
+        setIsLoading(false); // 로딩 종료
+        alert("이미지가 없습니다.");
+        return;
+      }
+      console.log(selectedImage);
 
-  // FormData 객체 생성
-  const formData = new FormData();
-  formData.append('image', selectedImage.file);
+      // FormData 객체 생성
+      const formData = new FormData();
+      formData.append("image", selectedImage.file);
 
-  const response = await fetch("https://carepaws-server.n-e.kr/predict", {
-    method: "POST",
-    body: formData,  // FormData를 body로 설정
-  });
+      const response = await fetch("https://carepaws-server.n-e.kr/v1/object-detection", {
+        method: "POST",
+        body: formData, // FormData를 body로 설정
+      });
 
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
 
-  const data = await response.json();
-  console.log(data);
-  setDiseaseInfo(data);
-  setIsLoading(false); // 로딩 종료
-  navigate("/location"); // 페이지 이동
-  return;
-} catch (e) {
-  console.error(e);
-  setIsLoading(false); // 로딩 종료
-  alert("예상치 못한 오류가 발생했습니다.");
-}
-setTimeout(() => {
-  setIsLoading(false); // 로딩 종료
-  navigate("/location"); // 페이지 이동
-}, 2000); // 2초 후 실행
+      const data = await response.json();
+      console.log(data);
+      setDiseaseInfo(data.result);
+      setIsLoading(false); // 로딩 종료
+      navigate("/location"); // 페이지 이동
+    } catch (e) {
+      console.error(e);
+      setIsLoading(false); // 로딩 종료
+      alert("예상치 못한 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -138,6 +134,7 @@ setTimeout(() => {
       {isLoading && (
         <div className={styles.background}>
           <img src="/images/loading.svg" alt="로딩 중" />
+          <div>CarePaws가 피부 병변을 분석 중 입니다!(최대 1분가량 소요)</div>
         </div>
       )}
     </div>

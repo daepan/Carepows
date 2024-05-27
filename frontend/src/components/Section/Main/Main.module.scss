@@ -9,6 +9,12 @@
   flex-direction: column;
   background-color: #FFF;
 
+  @include media.media-breakpoint(mobile) {
+    width: calc(100% - 40px);
+    height: auto;
+    padding: 20px;
+  }
+
   &__title {
     display: flex;
     justify-content: center;
@@ -17,6 +23,12 @@
     font-weight: 800;
     font-size: 48px;
     margin-bottom: 32px;
+
+    @include media.media-breakpoint(mobile) {
+      font-size: 24px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
   }
 
   &__content {
@@ -27,6 +39,12 @@
     font-weight: 500;
     font-size: 32px;
     text-align: center;
+
+    @include media.media-breakpoint(mobile) {
+      font-size: 16px;
+      padding: 0 10px;
+      margin-bottom: 16px;
+    }
   }
 
   &__detect {
@@ -38,10 +56,20 @@
     display: inline-block;
     margin: 12px 0;
     text-decoration: none;
+
+    @include media.media-breakpoint(mobile) {
+      font-size: 14px;
+      padding: 8px 16px;
+    }
   }
 }
 
 .logo {
   width: 400px;
   height: 400px;
+
+  @include media.media-breakpoint(mobile) {
+    width: 200px;
+    height: 200px;
+  }
 }

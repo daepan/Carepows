@@ -85,7 +85,7 @@ export default function Login() {
   return (
     <div className={styles.template}>
       <Typography variant="h4" className={styles.title}>
-        CarePaws 로그인
+      CarePaws 로그인
       </Typography>
       <div className={styles.content}>
         <FormControl>

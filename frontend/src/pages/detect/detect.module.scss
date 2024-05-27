@@ -8,6 +8,14 @@
   align-items: center;
   background-color: #fbfbfb;
 
+  @include media.media-breakpoint(mobile) {
+    flex-direction: column;
+    margin-top: 120px;
+    width: 100vw;
+    height: auto;
+    margin-bottom: 80px;
+  }
+
   &__context {
     width: 50vw;
     display: flex;
@@ -15,6 +23,10 @@
     align-items: center;
     flex-direction: column;
     font-family: Pretendard;
+  
+    @include media.media-breakpoint(mobile) {
+      width: 100vw;
+    }
   }
 
   &__title {
@@ -49,6 +61,11 @@
     width: 50vw;
     height: 100px;
 
+    @include media.media-breakpoint(mobile) {
+      width: 100vw;
+      height: auto;
+    }
+
     label {
       cursor: pointer;
       background-color: #e0e0e0;
@@ -81,15 +98,27 @@
   padding: 120px 40px;
   margin: 20px auto;
   cursor: pointer;
+
+  @include media.media-breakpoint(mobile) {
+    padding: 40px 40px;
+    width: 175px;
+    height: 175px;
+  }
 }
 
 .preview {
   display: flex;
-  width: 240;
+  width: 240px;
   height: 750px;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+
+  @include media.media-breakpoint(mobile) {
+    padding: 40px 40px;
+    width: 175px;
+    height: 175px;
+  }
 
   &__image {
     max-width: 240px;
@@ -125,12 +154,15 @@
 }
 
 .background {
-  width: 100vw;
-  height: 100vh;
+  width: 200vw;
+  height: 200vh;
   position: absolute;
+  margin-top: -120px;
   z-index: 10;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  color: white;
   background-color: rgba(0, 0, 0, 0.5);
 }

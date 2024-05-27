@@ -6,7 +6,7 @@ export default function Yolov5Section() {
       <div className={styles.section__content}>
         <div className={styles.title}>
           <h2>
-            <strong>YOLOv5</strong>
+            <strong>YOLOv9</strong>
           </h2>
           <h4>You Only Look Once</h4>
         </div>
@@ -16,23 +16,23 @@ export default function Yolov5Section() {
           있습니다.
         </div>
         <div className={styles.desciprtion}>
-          다양한 버전 중 2020년 6월에 출시된 Pytorch 기반의 YOLOv5는 이전 버전과
+          다양한 버전 중 가장 최신으로 출시된 Pytorch 기반의 YOLOv9는 이전 버전과
           비교하여 쉽게 환경 구성이 가능하고 빠르게 구현이 가능한 장점이 있어
-          Carepows에서 사용합니다.
+          CarePaws에서 사용합니다.
         </div>
         🚀{" "}
         <a
-          href="https://github.com/ultralytics/yolov5"
+          href="https://github.com/WongKinYiu/yolov9"
           target="_blank"
           rel="noreferrer"
         >
-          Yolov5 Github
+          Yolov9 Github
         </a>
       </div>
       <div>
         <img
           className={styles.section__image}
-          src={process.env.PUBLIC_URL + "images/yolov5_logo.png"}
+          src={process.env.PUBLIC_URL + "images/yolov9.jpg"}
           alt=""
         />
       </div>
